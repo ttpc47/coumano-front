@@ -28,9 +28,11 @@ export const CourseDetailModal: React.FC<CourseDetailModalProps> = ({
                 <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-primary-50 text-primary-800">
                   {course.code}
                 </span>
-                {/* <span className="inline-flex px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-800">
-                  {course.department}
-                </span> */}
+                {course.isShared && (
+                  <span className="inline-flex px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
+                    Shared
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -60,8 +62,8 @@ export const CourseDetailModal: React.FC<CourseDetailModalProps> = ({
                 <User className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-sm text-gray-600">Lecturer</p>
-                  <p className="font-medium text-gray-900">{course.lecturer.lastName}</p>
-                  <p className="text-xs text-gray-500">{course.lecturer.email}</p>
+                  <p className="font-medium text-gray-900">{course.lecturer?.name}</p>
+                  <p className="text-xs text-gray-500">{course.lecturer?.email}</p>
                 </div>
               </div>
               
@@ -70,6 +72,16 @@ export const CourseDetailModal: React.FC<CourseDetailModalProps> = ({
                 <div>
                   <p className="text-sm text-gray-600">Credits</p>
                   <p className="font-medium text-gray-900">{course.credits}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Specialties</p>
+                <div className="flex flex-wrap gap-1">
+                  {course.specialties.map((spec, idx) => (
+                    <span key={idx} className="px-2 py-1 bg-primary-100 text-primary-700 rounded-md text-xs">
+                      {spec}
+                    </span>
+                  ))}
                 </div>
               </div>
               <div>
@@ -86,7 +98,7 @@ export const CourseDetailModal: React.FC<CourseDetailModalProps> = ({
                 <div key={idx} className="flex items-center justify-between text-xs bg-gray-50 rounded p-2">
                   <div className="flex items-center space-x-2">
                     <Calendar className="w-3 h-3 text-gray-400" />
-                    <span>{slot.day} {slot.startTime}</span>
+                    <span>{slot.day} {slot.startTime}-{slot.endTime}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-gray-600">{slot.room}</span>

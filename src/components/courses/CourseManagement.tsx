@@ -31,6 +31,10 @@ export const CourseManagement: React.FC = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
+  // Hide/show stats and filters
+  const [showStats, setShowStats] = useState(true);
+  const [showFilters, setShowFilters] = useState(true);
+
   // For demonstration, use state for courses (replace with API in real app)
   const [courses, setCourses] = useState<Course[]>([
     {
@@ -193,7 +197,7 @@ export const CourseManagement: React.FC = () => {
       ...courseData,
       id: Date.now().toString(),
       materials: [],
-      isShared: false
+      isShared: courseData.isShared ?? false
     };
     setCourses(prev => [...prev, newCourse]);
     setShowCreateModal(false);
@@ -220,112 +224,130 @@ export const CourseManagement: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Course Management</h1>
           <p className="text-gray-600 mt-1">Manage courses, assignments, and specialties</p>
         </div>
-        {user?.role !== 'student' && (
-          <button 
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setShowStats((prev) => !prev)}
+            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            <span>Create Course</span>
+            {showStats ? 'Hide Stats' : 'Show Stats'}
           </button>
-        )}
+          <button
+            onClick={() => setShowFilters((prev) => !prev)}
+            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
+          {user?.role !== 'student' && (
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Course</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search courses..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            />
+      {showFilters && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              />
+            </div>
+            
+            <select
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            >
+              <option value="all">All Departments</option>
+              {departments.map(dept => (
+                <option key={dept} value={dept}>{dept}</option>
+              ))}
+            </select>
+
+            <select
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            >
+              <option value="all">All Semesters</option>
+              {semesters.map(sem => (
+                <option key={sem} value={sem}>{sem} 2024</option>
+              ))}
+            </select>
+
+            <label className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg">
+              <input
+                type="checkbox"
+                checked={showSharedOnly}
+                onChange={(e) => setShowSharedOnly(e.target.checked)}
+                className="rounded text-primary-600 focus:ring-primary-500"
+              />
+              <span className="text-sm text-gray-700">Shared only</span>
+            </label>
+
+            <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+              <Filter className="w-4 h-4" />
+              <span>More Filters</span>
+            </button>
           </div>
-          
-          <select
-            value={selectedDepartment}
-            onChange={(e) => setSelectedDepartment(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          >
-            <option value="all">All Departments</option>
-            {departments.map(dept => (
-              <option key={dept} value={dept}>{dept}</option>
-            ))}
-          </select>
-
-          <select
-            value={selectedSemester}
-            onChange={(e) => setSelectedSemester(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          >
-            <option value="all">All Semesters</option>
-            {semesters.map(sem => (
-              <option key={sem} value={sem}>{sem} 2024</option>
-            ))}
-          </select>
-
-          <label className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg">
-            <input
-              type="checkbox"
-              checked={showSharedOnly}
-              onChange={(e) => setShowSharedOnly(e.target.checked)}
-              className="rounded text-primary-600 focus:ring-primary-500"
-            />
-            <span className="text-sm text-gray-700">Shared only</span>
-          </label>
-
-          <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-            <Filter className="w-4 h-4" />
-            <span>More Filters</span>
-          </button>
         </div>
-      </div>
+      )}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Courses</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{courses.length}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600">
-              <BookOpen className="w-6 h-6 text-white" />
+      {showStats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Courses</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{courses.length}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600">
+                <BookOpen className="w-6 h-6 text-white" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Shared Courses</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
-                {courses.filter(c => c.isShared).length}
-              </p>
-            </div>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-accent-500 to-accent-600">
-              <Share2 className="w-6 h-6 text-white" />
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Shared Courses</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">
+                  {courses.filter(c => c.isShared).length}
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-gradient-to-br from-accent-500 to-accent-600">
+                <Share2 className="w-6 h-6 text-white" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Credits</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
-                {courses.reduce((sum, course) => sum + course.credits, 0)}
-              </p>
-            </div>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600">
-              <GraduationCap className="w-6 h-6 text-white" />
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Credits</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">
+                  {courses.reduce((sum, course) => sum + course.credits, 0)}
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Courses Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 overflow-x-auto">

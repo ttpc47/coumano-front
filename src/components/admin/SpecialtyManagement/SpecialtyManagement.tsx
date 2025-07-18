@@ -257,7 +257,7 @@ export const SpecialtyManagement: React.FC = () => {
                 <p className="text-3xl font-bold text-gray-900 mt-2">{specialties.length}</p>
               </div>
               <div className="p-3 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600">
-                <GraduationCap className="w-6 h-6 text-white" />
+                <GraduationCap className="w-6 h-6 text-white" /> 
               </div>
             </div>
           </div>

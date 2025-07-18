@@ -15,7 +15,6 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
   departments,
   specialties
 }) => {
-  // Use a separate form state for the modal, not the Course type directly
   const [formData, setFormData] = useState({
     name: '',
     code: '',
@@ -25,21 +24,21 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
     department: '',
     specialties: [] as string[],
     description: '',
+    isShared: false,
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = 'Course name is required';
     if (!formData.code.trim()) newErrors.code = 'Course code is required';
-    if (!formData.department) newErrors.department = 'Department is required';
+    if (!formData.specialties.length) newErrors.specialties = 'At least one specialty is required';
     if (!formData.lecturerName.trim()) newErrors.lecturerName = 'Lecturer is required';
+    if (!formData.department) newErrors.department = 'Department is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Transform form data to Course type on submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
@@ -66,7 +65,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
         specialties: formData.specialties,
         schedule: [],
         materials: [],
-        isShared: false,
+        isShared: formData.isShared,
         description: formData.description,
       };
       onSubmit(course);

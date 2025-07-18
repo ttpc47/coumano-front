@@ -22,16 +22,17 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
   departments,
   specialties
 }) => {
-  // Use a separate form state for the modal, not the Course type directly
   const [formData, setFormData] = useState({
     name: course.name,
     code: course.code,
     credits: course.credits,
     lecturerName: course.lecturer?.name || '',
     lecturerEmail: course.lecturer?.email || '',
-    department: (course.lecturer as any)?.department || '',
+    department: course.lecturer?.department || '',
     specialties: course.specialties || [],
     description: course.description || '',
+    schedule: course.schedule || [],
+    isShared: course.isShared || false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -46,7 +47,6 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  // Transform form data to Course type on submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
@@ -65,6 +65,9 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
         credits: formData.credits,
         lecturer,
         specialties: formData.specialties,
+        schedule: formData.schedule,
+        materials: course.materials || [],
+        isShared: formData.isShared,
         description: formData.description,
       };
       onSubmit(updatedCourse);

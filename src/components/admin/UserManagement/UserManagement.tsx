@@ -61,16 +61,21 @@ export const UserManagement: React.FC = () => {
   const handleCreateUser = (userData: Partial<User>) => {
     const newUser: User = {
       id: Date.now().toString(),
-      name: userData.name!,
-      email: userData.email!,
-      role: userData.role!,
-      department: userData.department!,
-      matriculeNumber: userData.matriculeNumber!,
+      matricule: userData.matricule ?? '', // Use provided or empty string
+      firstName: userData.firstName ?? '',
+      lastName: userData.lastName ?? '',
+      name: `${userData.firstName ?? ''} ${userData.lastName ?? ''}`,
+      email: userData.email ?? '',
+      phone: userData.phone ?? '',
       isActive: true,
-      createdDate: new Date().toISOString(),
-      phone: userData.phone,
-      yearOfStudy: userData.yearOfStudy,
-      specialization: userData.specialization
+      role: userData.role as 'admin' | 'lecturer' | 'student',
+      avatar: userData.avatar,
+      department: userData.department,
+      specialty: userData.specialty,
+      isFirstLogin: true,
+      createdAt: new Date().toISOString(),
+      password: userData.password,
+      
     };
     setUsers([...users, newUser]);
     setShowCreateModal(false);
@@ -132,21 +137,6 @@ export const UserManagement: React.FC = () => {
       case 'admin': return 'bg-red-100 text-red-800';
       case 'librarian': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const formatLastLogin = (lastLogin?: string) => {
-    if (!lastLogin) return 'Never';
-    const date = new Date(lastLogin);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 24) {
-      return `${diffInHours}h ago`;
-    } else if (diffInHours < 168) {
-      return `${Math.floor(diffInHours / 24)}d ago`;
-    } else {
-      return date.toLocaleDateString();
     }
   };
 
@@ -218,7 +208,7 @@ export const UserManagement: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Faculty</p>
-              <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.role === 'faculty').length}</p>
+              <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.role === 'lecturer').length}</p>
             </div>
             <div className="p-3 rounded-lg bg-yellow-100">
               <Building className="w-6 h-6 text-yellow-600" />
@@ -388,7 +378,7 @@ export const UserManagement: React.FC = () => {
                       <div>
                         <div className="text-sm font-medium text-gray-900">{user.name}</div>
                         <div className="text-sm text-gray-500">{user.email}</div>
-                        <div className="text-xs text-gray-400">{user.matriculeNumber}</div>
+                        <div className="text-xs text-gray-400">{user.matricule}</div>
                       </div>
                     </div>
                   </td>
@@ -409,7 +399,7 @@ export const UserManagement: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
-                    {formatLastLogin(user.lastLogin)}
+                    {user.isFirstLogin }
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">

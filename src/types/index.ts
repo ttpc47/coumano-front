@@ -4,6 +4,8 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
+  isActive: boolean;
   role: 'admin' | 'lecturer' | 'student';
   avatar?: string;
   department?: string;
@@ -11,6 +13,7 @@ export interface User {
   isFirstLogin: boolean;
   createdAt: string;
   password?: string;
+  name: string; // Concat of firstName and lastName
 }
 
 export interface Department {
@@ -41,6 +44,7 @@ export interface Course {
   schedule: CourseSchedule[];
   materials: CourseMaterial[];
   isShared: boolean;
+  description?:string;
 }
 
 export interface CourseSchedule {
@@ -90,4 +94,8 @@ export interface Announcement {
   target: 'all' | 'students' | 'lecturers' | 'department';
   isUrgent: boolean;
   createdAt: string;
+}
+
+export function getUserFullName(user: User): string {
+  return `${user.firstName} ${user.lastName}`;
 }

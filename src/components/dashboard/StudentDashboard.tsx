@@ -18,18 +18,16 @@ const StatCard: React.FC<{
   color: string;
   subtitle?: string;
 }> = ({ title, value, icon, color, subtitle }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-gray-600">{title}</p>
-        <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
-        {subtitle && (
-          <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
-        )}
-      </div>
-      <div className={`p-3 rounded-xl ${color}`}>
-        {icon}
-      </div>
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow flex items-center justify-between">
+    <div>
+      <p className="text-sm font-medium text-gray-900">{title}</p>
+      <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+      {subtitle && (
+        <p className="text-sm text-gray-700 mt-1">{subtitle}</p>
+      )}
+    </div>
+    <div className={`p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700`}>
+      {icon}
     </div>
   </div>
 );
@@ -37,32 +35,32 @@ const StatCard: React.FC<{
 export const StudentDashboard: React.FC = () => {
   const stats = [
     {
-      title: 'Enrolled Courses',
+      title: 'Active Courses',
       value: '8',
       icon: <BookOpen className="w-6 h-6 text-white" />,
-      color: 'bg-gradient-to-br from-primary-500 to-primary-600',
+      color: '', // color now handled in StatCard
       subtitle: 'Level 3 Software Engineering'
     },
     {
       title: 'Attendance Rate',
       value: '92%',
       icon: <CheckCircle className="w-6 h-6 text-white" />,
-      color: 'bg-gradient-to-br from-secondary-500 to-secondary-600',
+      color: '',
       subtitle: 'Above average'
     },
     {
-      title: 'Assignments Due',
+      title: 'Documents Accessed',
       value: '3',
-      icon: <Clock className="w-6 h-6 text-white" />,
-      color: 'bg-gradient-to-br from-accent-500 to-accent-600',
+      icon: <BookOpen className="w-6 h-6 text-white" />,
+      color: '',
       subtitle: 'This week'
     },
     {
-      title: 'GPA',
-      value: '3.7',
-      icon: <Award className="w-6 h-6 text-white" />,
-      color: 'bg-gradient-to-br from-purple-500 to-purple-600',
-      subtitle: 'Current semester'
+      title: 'Scheduled Courses',
+      value: '',
+      icon: <Video className="w-6 h-6 text-white" />,
+      color: '',
+      subtitle: 'This week'
     }
   ];
 
@@ -147,6 +145,7 @@ export const StudentDashboard: React.FC = () => {
         ))}
       </div>
 
+      {/* Today's Classes & Recent Grades */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Today's Classes */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -157,6 +156,7 @@ export const StudentDashboard: React.FC = () => {
           <div className="space-y-4">
             {todaysClasses.map((cls, index) => (
               <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                {/* Class Info */}
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold text-gray-900">{cls.course}</h3>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -175,6 +175,7 @@ export const StudentDashboard: React.FC = () => {
                   <p>{cls.time} • {cls.room}</p>
                   <p>Lecturer: {cls.lecturer}</p>
                 </div>
+                {/* Action Buttons */}
                 <div className="mt-3 flex space-x-2">
                   <button className="flex items-center space-x-1 px-3 py-1 bg-primary-100 text-primary-700 rounded-md text-xs hover:bg-primary-200 transition-colors">
                     <Video className="w-3 h-3" />
@@ -222,36 +223,8 @@ export const StudentDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Academic Progress */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upcoming Deadlines */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Upcoming Deadlines</h2>
-            <AlertCircle className="w-5 h-5 text-gray-400" />
-          </div>
-          <div className="space-y-3">
-            {upcomingDeadlines.map((deadline, index) => (
-              <div key={index} className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{deadline.task}</p>
-                  <p className="text-xs text-gray-600">{deadline.course}</p>
-                  <p className="text-xs text-gray-500 mt-1">Due: {deadline.due}</p>
-                </div>
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  deadline.priority === 'high' 
-                    ? 'bg-red-100 text-red-800' 
-                    : deadline.priority === 'medium'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-green-100 text-green-800'
-                }`}>
-                  {deadline.priority}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Academic Progress */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">Academic Progress</h2>
@@ -268,7 +241,6 @@ export const StudentDashboard: React.FC = () => {
                 <div className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full" style={{width: '75%'}}></div>
               </div>
             </div>
-            
             <div className="grid grid-cols-2 gap-4 text-center">
               <div className="bg-gray-50 rounded-lg p-3">
                 <p className="text-2xl font-bold text-gray-900">24</p>

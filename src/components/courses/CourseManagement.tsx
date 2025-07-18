@@ -6,63 +6,58 @@ import {
   Filter,
   Edit, 
   Trash2, 
-  Users,
-  Clock,
   Share2,
   Calendar,
   User,
   GraduationCap
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { CreateCourseModal } from './CreateCourseModal';
+import { EditCourseModal } from './EditCourseModal';
+import { CourseDetailModal } from './CourseDetailModal';
 
-interface Course {
-  id: string;
-  name: string;
-  code: string;
-  credits: number;
-  lecturer: string;
-  lecturerEmail: string;
-  department: string;
-  specialties: string[];
-  schedule: {
-    day: string;
-    time: string;
-    room: string;
-    type: 'lecture' | 'practical' | 'tutorial';
-  }[];
-  enrolledStudents: number;
-  maxStudents: number;
-  isShared: boolean;
-  semester: string;
-  year: number;
-  description: string;
-}
+import { Course } from '../../types';
 
 export const CourseManagement: React.FC = () => {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const [selectedSemester, setSelectedSemester] = useState<string>('all');
   const [showSharedOnly, setShowSharedOnly] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const mockCourses: Course[] = [
+  // Modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+
+  // For demonstration, use state for courses (replace with API in real app)
+  const [courses, setCourses] = useState<Course[]>([
     {
       id: '1',
       name: 'Advanced Algorithms',
       code: 'CS301',
       credits: 4,
-      lecturer: 'Dr. Paul Mbarga',
-      lecturerEmail: 'p.mbarga@university.cm',
-      department: 'Computer Science',
+      lecturer: {
+        id: 'l1',
+        matricule: '',
+        firstName: 'Paul',
+        lastName: 'Mbarga',
+        email: 'p.mbarga@university.cm',
+        phone: '',
+        isActive: true,
+        role: 'lecturer',
+        isFirstLogin: false,
+        createdAt: '',
+        name: 'Paul Mbarga'
+      },
       specialties: ['Software Engineering', 'Data Science'],
       schedule: [
-        { day: 'Monday', time: '08:00-10:00', room: 'Lab A-205', type: 'practical' },
-        { day: 'Wednesday', time: '14:00-16:00', room: 'Amphitheater C', type: 'lecture' }
+        { id: 's1', day: 'Monday', startTime: '08:00', endTime: '10:00', room: 'Lab A-205', type: 'practical' },
+        { id: 's2', day: 'Wednesday', startTime: '14:00', endTime: '16:00', room: 'Amphitheater C', type: 'lecture' }
       ],
-      enrolledStudents: 67,
-      maxStudents: 80,
+      materials: [],
       isShared: true,
-      semester: 'Fall',
-      year: 2024,
       description: 'Advanced algorithmic techniques and complexity analysis'
     },
     {
@@ -70,19 +65,26 @@ export const CourseManagement: React.FC = () => {
       name: 'Database Systems',
       code: 'CS205',
       credits: 3,
-      lecturer: 'Prof. Marie Nkomo',
-      lecturerEmail: 'm.nkomo@university.cm',
-      department: 'Computer Science',
+      lecturer: {
+        id: 'l2',
+        matricule: '',
+        firstName: 'Marie',
+        lastName: 'Nkomo',
+        email: 'm.nkomo@university.cm',
+        phone: '',
+        isActive: true,
+        role: 'lecturer',
+        isFirstLogin: false,
+        createdAt: '',
+        name: 'Marie Nkomo'
+      },
       specialties: ['Software Engineering'],
       schedule: [
-        { day: 'Tuesday', time: '10:00-12:00', room: 'Room B-101', type: 'lecture' },
-        { day: 'Thursday', time: '14:00-17:00', room: 'Lab B-205', type: 'practical' }
+        { id: 's3', day: 'Tuesday', startTime: '10:00', endTime: '12:00', room: 'Room B-101', type: 'lecture' },
+        { id: 's4', day: 'Thursday', startTime: '14:00', endTime: '17:00', room: 'Lab B-205', type: 'practical' }
       ],
-      enrolledStudents: 45,
-      maxStudents: 50,
+      materials: [],
       isShared: false,
-      semester: 'Fall',
-      year: 2024,
       description: 'Relational databases, SQL, and database design principles'
     },
     {
@@ -90,19 +92,26 @@ export const CourseManagement: React.FC = () => {
       name: 'Linear Algebra',
       code: 'MATH201',
       credits: 3,
-      lecturer: 'Dr. Jean Fotso',
-      lecturerEmail: 'j.fotso@university.cm',
-      department: 'Mathematics',
+      lecturer: {
+        id: 'l3',
+        matricule: '',
+        firstName: 'Jean',
+        lastName: 'Fotso',
+        email: 'j.fotso@university.cm',
+        phone: '',
+        isActive: true,
+        role: 'lecturer',
+        isFirstLogin: false,
+        createdAt: '',
+        name: 'Jean Fotso'
+      },
       specialties: ['Applied Mathematics', 'Data Science', 'Physics'],
       schedule: [
-        { day: 'Monday', time: '10:00-12:00', room: 'Room C-301', type: 'lecture' },
-        { day: 'Friday', time: '08:00-10:00', room: 'Room C-301', type: 'tutorial' }
+        { id: 's5', day: 'Monday', startTime: '10:00', endTime: '12:00', room: 'Room C-301', type: 'lecture' },
+        { id: 's6', day: 'Friday', startTime: '08:00', endTime: '10:00', room: 'Room C-301', type: 'tutorial' }
       ],
-      enrolledStudents: 89,
-      maxStudents: 100,
+      materials: [],
       isShared: true,
-      semester: 'Fall',
-      year: 2024,
       description: 'Vector spaces, matrices, eigenvalues and linear transformations'
     },
     {
@@ -110,34 +119,62 @@ export const CourseManagement: React.FC = () => {
       name: 'Software Engineering',
       code: 'CS302',
       credits: 4,
-      lecturer: 'Dr. Sarah Biya',
-      lecturerEmail: 's.biya@university.cm',
-      department: 'Computer Science',
+      lecturer: {
+        id: 'l4',
+        matricule: '',
+        firstName: 'Sarah',
+        lastName: 'Biya',
+        email: 's.biya@university.cm',
+        phone: '',
+        isActive: true,
+        role: 'lecturer',
+        isFirstLogin: false,
+        createdAt: '',
+        name: 'Sarah Biya'
+      },
       specialties: ['Software Engineering'],
       schedule: [
-        { day: 'Tuesday', time: '14:00-16:00', room: 'Amphitheater A', type: 'lecture' },
-        { day: 'Thursday', time: '08:00-11:00', room: 'Lab A-101', type: 'practical' }
+        { id: 's7', day: 'Tuesday', startTime: '14:00', endTime: '16:00', room: 'Amphitheater A', type: 'lecture' },
+        { id: 's8', day: 'Thursday', startTime: '08:00', endTime: '11:00', room: 'Lab A-101', type: 'practical' }
       ],
-      enrolledStudents: 42,
-      maxStudents: 45,
+      materials: [],
       isShared: false,
-      semester: 'Fall',
-      year: 2024,
       description: 'Software development lifecycle, project management and quality assurance'
     }
-  ];
+  ]);
 
   const departments = ['Computer Science', 'Mathematics', 'Physics', 'Engineering'];
   const semesters = ['Fall', 'Spring', 'Summer'];
+  const specialties = [
+    'Software Engineering',
+    'Data Science',
+    'Applied Mathematics',
+    'Physics',
+    'Civil Engineering'
+  ];
 
-  const filteredCourses = mockCourses.filter(course => {
+  // Filter logic for students: only courses in their specialties
+  const filteredCourses = courses.filter(course => {
     const matchesSearch = course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.lecturer.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = selectedDepartment === 'all' || course.department === selectedDepartment;
-    const matchesSemester = selectedSemester === 'all' || course.semester === selectedSemester;
+                         (course.lecturer && course.lecturer.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesDepartment = selectedDepartment === 'all' || (course.lecturer && course.lecturer.department === selectedDepartment);
+    const matchesSemester = selectedSemester === 'all'; // No semester property in Course, adjust if needed
     const matchesShared = !showSharedOnly || course.isShared;
-    
+
+    // Students: only courses matching their single specialty
+    if (user?.role === 'student' && typeof user.specialty === 'string') {
+      const hasSpecialty = course.specialties.includes(user.specialty);
+      return matchesSearch && matchesDepartment && matchesSemester && matchesShared && hasSpecialty;
+    }
+
+    // Lecturers: only courses assigned to them
+    if (user?.role === 'lecturer' && (user.lastName || user.email)) {
+      const isLecturer = course.lecturer.lastName === user.lastName || course.lecturer.email === user.email;
+      return matchesSearch && matchesDepartment && matchesSemester && matchesShared && isLecturer;
+    }
+
+    // Other roles: show all filtered courses
     return matchesSearch && matchesDepartment && matchesSemester && matchesShared;
   });
 
@@ -150,11 +187,30 @@ export const CourseManagement: React.FC = () => {
     }
   };
 
-  const getEnrollmentColor = (enrolled: number, max: number) => {
-    const percentage = (enrolled / max) * 100;
-    if (percentage >= 90) return 'text-red-600';
-    if (percentage >= 75) return 'text-yellow-600';
-    return 'text-green-600';
+  // Modal handlers
+  const handleCreateCourse = (courseData: Course) => {
+    const newCourse: Course = {
+      ...courseData,
+      id: Date.now().toString(),
+      materials: [],
+      isShared: false
+    };
+    setCourses(prev => [...prev, newCourse]);
+    setShowCreateModal(false);
+  };
+
+  const handleEditCourse = (updatedCourse: Course) => {
+    setCourses(prev =>
+      prev.map(course => (course.id === updatedCourse.id ? { ...course, ...updatedCourse } : course))
+    );
+    setShowEditModal(false);
+    setSelectedCourse(null);
+  };
+
+  const handleDeleteCourse = (courseId: string) => {
+    if (window.confirm('Are you sure you want to delete this course?')) {
+      setCourses(prev => prev.filter(course => course.id !== courseId));
+    }
   };
 
   return (
@@ -162,15 +218,17 @@ export const CourseManagement: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Course Management</h1>
-          <p className="text-gray-600 mt-1">Manage courses, assignments, and enrollments</p>
+          <p className="text-gray-600 mt-1">Manage courses, assignments, and specialties</p>
         </div>
-        <button 
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Create Course</span>
-        </button>
+        {user?.role !== 'student' && (
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create Course</span>
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -232,7 +290,7 @@ export const CourseManagement: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Courses</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{mockCourses.length}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{courses.length}</p>
             </div>
             <div className="p-3 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600">
               <BookOpen className="w-6 h-6 text-white" />
@@ -243,23 +301,9 @@ export const CourseManagement: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Enrolled Students</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
-                {mockCourses.reduce((sum, course) => sum + course.enrolledStudents, 0)}
-              </p>
-            </div>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-secondary-500 to-secondary-600">
-              <Users className="w-6 h-6 text-white" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
               <p className="text-sm font-medium text-gray-600">Shared Courses</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">
-                {mockCourses.filter(c => c.isShared).length}
+                {courses.filter(c => c.isShared).length}
               </p>
             </div>
             <div className="p-3 rounded-xl bg-gradient-to-br from-accent-500 to-accent-600">
@@ -273,7 +317,7 @@ export const CourseManagement: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Credits</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">
-                {mockCourses.reduce((sum, course) => sum + course.credits, 0)}
+                {courses.reduce((sum, course) => sum + course.credits, 0)}
               </p>
             </div>
             <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600">
@@ -283,131 +327,143 @@ export const CourseManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Courses Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredCourses.map((course) => (
-          <div key={course.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">{course.code}</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">{course.name}</h3>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-sm text-gray-600">{course.department}</span>
-                    {course.isShared && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                        Shared
+      {/* Courses Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Lecturer</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Credits</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Specialties</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Schedule</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {filteredCourses.map((course) => (
+              <tr key={course.id} className="hover:bg-gray-50">
+                <td className="px-4 py-2 font-mono text-sm text-gray-900">{course.code}</td>
+                <td className="px-4 py-2 text-gray-900">{course.name}</td>
+                <td className="px-4 py-2 text-gray-700">{course.lecturer?.department ?? ''}</td>
+                <td className="px-4 py-2 text-gray-700">{course.lecturer?.name}</td>
+                <td className="px-4 py-2 text-gray-700">{course.credits}</td>
+                <td className="px-4 py-2">
+                  <div className="flex flex-wrap gap-1">
+                    {course.specialties.map((specialty, idx) => (
+                      <span key={idx} className="px-2 py-1 bg-primary-100 text-primary-700 rounded-md text-xs">
+                        {specialty}
                       </span>
-                    )}
+                    ))}
                   </div>
-                </div>
-              </div>
-              <div className="flex space-x-2">
-                <button className="text-secondary-600 hover:text-secondary-900 transition-colors">
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button className="text-red-600 hover:text-red-900 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            <p className="text-gray-700 mb-4">{course.description}</p>
-
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">Credits:</span>
-                  <span className="font-medium text-gray-900 ml-2">{course.credits}</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Semester:</span>
-                  <span className="font-medium text-gray-900 ml-2">{course.semester} {course.year}</span>
-                </div>
-              </div>
-              <div className="mt-2">
-                <div className="flex items-center space-x-2 text-sm">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">Lecturer:</span>
-                  <span className="font-medium text-gray-900">{course.lecturer}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                <span>Enrollment:</span>
-                <span className={`font-medium ${getEnrollmentColor(course.enrolledStudents, course.maxStudents)}`}>
-                  {course.enrolledStudents}/{course.maxStudents}
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full" 
-                  style={{width: `${(course.enrolledStudents / course.maxStudents) * 100}%`}}
-                ></div>
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <div className="text-sm text-gray-600 mb-2">Specialties:</div>
-              <div className="flex flex-wrap gap-1">
-                {course.specialties.map((specialty, index) => (
-                  <span key={index} className="px-2 py-1 bg-primary-100 text-primary-700 rounded-md text-xs">
-                    {specialty}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <div className="text-sm text-gray-600 mb-2">Schedule:</div>
-              <div className="space-y-1">
-                {course.schedule.map((slot, index) => (
-                  <div key={index} className="flex items-center justify-between text-xs bg-gray-50 rounded p-2">
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="w-3 h-3 text-gray-400" />
-                      <span>{slot.day} {slot.time}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-600">{slot.room}</span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(slot.type)}`}>
-                        {slot.type}
-                      </span>
-                    </div>
+                </td>
+                <td className="px-4 py-2">
+                  <div className="flex flex-col gap-1">
+                    {course.schedule.map((slot) => (
+                      <div key={slot.id} className="flex items-center gap-2 text-xs">
+                        <Calendar className="w-3 h-3 text-gray-400" />
+                        <span>{slot.day} {slot.startTime}-{slot.endTime}</span>
+                        <span className="text-gray-600">{slot.room}</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(slot.type)}`}>
+                          {slot.type}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex space-x-3">
-              <button className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition-colors">
-                <Users className="w-4 h-4" />
-                <span>Manage Students</span>
-              </button>
-              <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition-colors">
-                <Clock className="w-4 h-4" />
-                <span>Schedule</span>
-              </button>
-            </div>
-          </div>
-        ))}
+                </td>
+                <td className="px-4 py-2">
+                  <div className="flex space-x-2">
+                    <button
+                      className="text-primary-600 hover:text-primary-900 transition-colors"
+                      onClick={() => {
+                        setSelectedCourse(course);
+                        setShowDetailModal(true);
+                      }}
+                      title="View Details"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="text-secondary-600 hover:text-secondary-900 transition-colors"
+                      onClick={() => {
+                        setSelectedCourse(course);
+                        setShowEditModal(true);
+                      }}
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-900 transition-colors"
+                      onClick={() => handleDeleteCourse(course.id)}
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {filteredCourses.length === 0 && (
+              <tr>
+                <td colSpan={8} className="py-12 text-center">
+                  <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No courses found</h3>
+                  <p className="text-gray-600 mb-4">No courses match your search criteria.</p>
+                  {user?.role !== 'student' && (
+                    <button 
+                      onClick={() => setShowCreateModal(true)}
+                      className="px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
+                    >
+                      Create First Course
+                    </button>
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {filteredCourses.length === 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-          <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No courses found</h3>
-          <p className="text-gray-600 mb-4">No courses match your search criteria.</p>
-          <button 
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
-          >
-            Create First Course
-          </button>
-        </div>
+      {/* Create Course Modal */}
+      {showCreateModal && (
+        <CreateCourseModal 
+          onClose={() => setShowCreateModal(false)} 
+          onSubmit={handleCreateCourse}
+          departments={departments}
+          specialties={specialties}
+        />
+      )}
+
+      {/* Edit Course Modal */}
+      {showEditModal && selectedCourse && (
+        <EditCourseModal 
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedCourse(null);
+          }}
+          onSubmit={handleEditCourse}
+          course={selectedCourse}
+          departments={departments}
+          specialties={specialties}
+        />
+      )}
+
+      {/* Course Detail Modal */}
+      {showDetailModal && selectedCourse && (
+        <CourseDetailModal 
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedCourse(null);
+          }}
+          course={selectedCourse}
+          onEdit={() => {
+            setShowDetailModal(false);
+            setShowEditModal(true);
+          }}
+        />
       )}
     </div>
   );

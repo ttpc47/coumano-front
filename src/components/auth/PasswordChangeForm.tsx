@@ -37,17 +37,15 @@ export const PasswordChangeForm: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-accent-500 to-accent-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Lock className="w-10 h-10 text-white" />
-          </div>
+        <div className="text-center mb-3">
+          
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Change Your Password</h1>
           <p className="text-gray-600">
-            Welcome, {user?.firstName}! Please change your default password to continue.
+            Welcome, {user?.firstName} to COUMANO! Please change your default password to continue.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-blue-700 rounded-2xl shadow-xl p-8 ">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
@@ -68,7 +66,7 @@ export const PasswordChangeForm: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-900 mb-2">
                 New Password
               </label>
               <div className="relative">
@@ -94,7 +92,7 @@ export const PasswordChangeForm: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-900 mb-2">
                 Confirm New Password
               </label>
               <div className="relative">

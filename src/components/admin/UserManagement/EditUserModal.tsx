@@ -20,10 +20,9 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
     email: user.email,
     role: user.role,
     department: user.department || '',
-    matriculeNumber: user.matriculeNumber || '',
+    matriculeNumber: user.matricule || '',
     phone: user.phone || '',
-    yearOfStudy: user.yearOfStudy || 1,
-    specialization: user.specialization || '',
+    specialization: user.specialty || '',
     isActive: user.isActive
   });
 
@@ -167,7 +166,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="student">Student</option>
-                  <option value="faculty">Faculty</option>
+                  <option value="lecturer">lecturer</option>
                   <option value="admin">Administrator</option>
                   <option value="librarian">Librarian</option>
                 </select>
@@ -256,9 +255,9 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
             </div>
           )}
 
-          {formData.role === 'faculty' && (
+          {formData.role === 'lecturer' && (
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Faculty Information</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">lecturer Information</h3>
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">

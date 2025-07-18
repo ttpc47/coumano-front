@@ -6,9 +6,9 @@ import { PasswordChangeForm } from './components/auth/PasswordChangeForm';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
 import { Dashboard } from './components/dashboard/Dashboard';
-import { EnhancedUserManagement } from './components/admin/Usermanagement/EnhancedUserManagement';
-import { DepartmentManagement } from './components/admin/DepartmentManagement';
-import { SpecialtyManagement } from './components/admin/SpecialtyManagement';
+import { UserManagement } from './components/admin/UserManagement/UserManagement';
+import { DepartmentManagement } from './components/admin/DepartmentManagement/DepartmentManagement';
+import { SpecialtyManagement } from './components/admin/SpecialtyManagement/SpecialtyManagement';
 import { SystemAnalytics } from './components/admin/SystemAnalytics';
 import { BulkUserImport } from './components/admin/BulkUserImport';
 import { SystemSettings } from './components/admin/SystemSettings';
@@ -21,16 +21,18 @@ import { EnhancedAttendanceManagement } from './components/attendance/EnhancedAt
 import { RecordingManagement } from './components/recordings/RecordingManagement';
 import { NotificationCenter } from './components/notifications/NotificationCenter';
 import { Settings } from './components/settings/Settings';
+import { Menu } from 'lucide-react'; // Add this import
 
 const AppContent: React.FC = () => {
   const { user, isLoading } = useAuth();
   const [activeItem, setActiveItem] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-18 h-18 bg-gradient-to-br from-red-600 to-secondary-100 rounded-xl flex items-center justify-center mx-auto mb-4 animate-bounce-subtle">
+          <div className="w-18 h-20 bg-gradient-to-br from-red-600 to-secondary-100 rounded-xl flex items-center justify-center mx-auto mb-4 animate-bounce-subtle">
                 <span className="text-blue-600 font-extrabold text-lg">CM</span>
            </div>
           <p className="text-gray-600 font-medium">Loading COUMANO...</p>
@@ -52,7 +54,7 @@ const AppContent: React.FC = () => {
       case 'dashboard':
         return <Dashboard />;
       case 'users':
-        return <EnhancedUserManagement />;
+        return <UserManagement />;
       case 'departments':
         return <DepartmentManagement />;
       case 'specialties':
@@ -87,11 +89,24 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen bg-gray-50 flex flex-col">
       <Header />
-      <div className="flex">
-        <Sidebar activeItem={activeItem} onItemClick={setActiveItem} />
-        <main className="flex-1 p-6">
+      {/* Hamburger for mobile */}
+      <button
+        className="lg:hidden fixed top-4 left-4 z-50 bg-white rounded-full p-2 shadow"
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Open sidebar"
+      >
+        <Menu className="w-6 h-6 text-blue-700" />
+      </button>
+      <div className="flex flex-1 h-full">
+        <Sidebar
+          activeItem={activeItem}
+          onItemClick={setActiveItem}
+          showSidebar={sidebarOpen || window.innerWidth >= 1024}
+          onCloseSidebar={() => setSidebarOpen(false)}
+        />
+        <main className="flex-1 p-6 overflow-auto ml-0 scrollbar-hide  h-full">
           <div className="animate-fade-in">
             {renderContent()}
           </div>

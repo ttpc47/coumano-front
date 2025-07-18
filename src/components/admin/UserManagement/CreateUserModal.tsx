@@ -31,7 +31,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const generateMatriculeNumber = (role: string, department: string) => {
+  const generateMatriculeNumber = (role: string) => {
     const rolePrefix = {
       student: 'STU',
       Lecturer: 'LEC',
@@ -80,16 +80,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleCreateUser = async() =>{
-    try{
-      setLoading(true);
-      await userService.createUser(formData);
-    }catch(error){
-    console.log("user creation error");
-    }finally{
-      setLoading(False)
-    }
-  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
@@ -101,7 +92,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
     setFormData(prev => ({
       ...prev,
       role,
-      matriculeNumber: generateMatriculeNumber(role, prev.department)
+      matriculeNumber: generateMatriculeNumber(role)
     }));
   };
 
@@ -109,7 +100,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
     setFormData(prev => ({
       ...prev,
       department,
-      matriculeNumber: generateMatriculeNumber(prev.role, prev.department)
+      matriculeNumber: generateMatriculeNumber(prev.role)
     }));
   };
 

@@ -22,9 +22,16 @@ import { useAuth } from '../../contexts/AuthContext';
 interface SidebarProps {
   activeItem: string;
   onItemClick: (item: string) => void;
+  showSidebar?: boolean; // NEW
+  onCloseSidebar?: () => void; // NEW
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  activeItem,
+  onItemClick,
+  showSidebar = true,
+  onCloseSidebar,
+}) => {
   const { user } = useAuth();
 
   const getMenuItems = () => {
@@ -71,30 +78,48 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => 
   const menuItems = getMenuItems();
 
   return (
-    <aside className="bg-blue-400 border-r-2 border-blue-400 w-64 min-h-screen sticky  "  >
-      <nav className="p-4 space-y-1 overflow-y-auto">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeItem === item.id;
-          
-          return (
-            <button
-              key={item.id}
-              onClick={() => onItemClick(item.id)}
-              className={`
-                w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200
-                ${isActive 
-                  ? 'bg-gradient-to-l from-primary-100 to-secondary-400 text-gray-500 shadow-lg scale-105' 
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-primary-600'
-                }
-              `}
-            >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} />
-              <span className="font-medium">{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
-    </aside>
+    <>
+      {/* Overlay for mobile */}
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-40 z-40 lg:hidden transition-opacity ${
+          showSidebar ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onCloseSidebar}
+      />
+      <aside
+        className={`
+          bg-blue-700 border-r-2 border-blue-400 w-64 h-screen sticky top-20 left-0 z-50
+          transition-transform duration-300
+          ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0 lg:static lg:block
+        `}
+      >
+        <nav className="p-4 space-y-1 overflow-y-auto">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeItem === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  onItemClick(item.id);
+                  if (onCloseSidebar) onCloseSidebar();
+                }}
+                className={`
+                  w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200
+                  ${isActive 
+                    ? 'bg-gradient-to-l from-primary-100 to-secondary-400 text-gray-900 shadow-lg scale-105' 
+                    : 'text-white hover:bg-gray-100 hover:text-primary-600'
+                  }
+                `}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} />
+                <span className="font-medium">{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
   );
 };

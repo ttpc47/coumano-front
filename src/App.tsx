@@ -13,6 +13,7 @@ import { SystemAnalytics } from './components/admin/SystemAnalytics';
 import { BulkUserImport } from './components/admin/BulkUserImport';
 import { SystemSettings } from './components/admin/SystemSettings';
 import { CourseManagement } from './components/courses/CourseManagement';
+import { CourseScheduleManagement } from './components/schedule/CourseScheduleManagement';
 import { EnhancedJitsiClassroom } from './components/classroom/EnhancedJitsiClassroom';
 import { EnhancedSchedule } from './components/schedule/EnhancedSchedule';
 import { Materials } from './components/materials/Materials';
@@ -67,6 +68,8 @@ const AppContent: React.FC = () => {
         return <SystemSettings />;
       case 'courses':
         return <CourseManagement />;
+      case 'course-schedules':
+        return <CourseScheduleManagement />;
       case 'schedule':
         return <EnhancedSchedule />;
       case 'virtual-classroom':

@@ -38,6 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const commonItems = [
       { id: 'dashboard', label: 'Dashboard', icon: Home },
       { id: 'courses', label: 'Courses', icon: BookOpen },
+      { id: 'course-schedules', label: 'Course Schedules', icon: Calendar },
       { id: 'schedule', label: 'Schedule', icon: Calendar },
       { id: 'virtual-classroom', label: 'Virtual Classroom', icon: Video },
       { id: 'materials', label: 'Materials', icon: FileText },

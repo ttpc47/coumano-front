@@ -15,6 +15,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { CreateCourseModal } from './CreateCourseModal';
 import { EditCourseModal } from './EditCourseModal';
 import { CourseDetailModal } from './CourseDetailModal';
+import { CourseScheduleManagement } from '../schedule/CourseScheduleManagement';
 
 import { Course } from '../../types';
 
@@ -30,6 +31,7 @@ export const CourseManagement: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [activeTab, setActiveTab] = useState<'courses' | 'schedules'>('courses');
 
   // Hide/show stats and filters
   const [showStats, setShowStats] = useState(true);
@@ -225,6 +227,28 @@ export const CourseManagement: React.FC = () => {
           <p className="text-gray-600 mt-1">Manage courses, assignments, and specialties</p>
         </div>
         <div className="flex space-x-2">
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('courses')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'courses' 
+                  ? 'bg-white text-gray-900 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Courses
+            </button>
+            <button
+              onClick={() => setActiveTab('schedules')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'schedules' 
+                  ? 'bg-white text-gray-900 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Schedules
+            </button>
+          </div>
           <button
             onClick={() => setShowStats((prev) => !prev)}
             className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
@@ -249,6 +273,11 @@ export const CourseManagement: React.FC = () => {
         </div>
       </div>
 
+      {/* Tab Content */}
+      {activeTab === 'schedules' ? (
+        <CourseScheduleManagement />
+      ) : (
+        <>
       {/* Filters */}
       {showFilters && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -448,6 +477,8 @@ export const CourseManagement: React.FC = () => {
           </tbody>
         </table>
       </div>
+        </>
+      )}
 
       {/* Create Course Modal */}
       {showCreateModal && (

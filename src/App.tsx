@@ -15,6 +15,7 @@ import { SystemSettings } from './components/admin/SystemSettings';
 import { CourseManagement } from './components/courses/CourseManagement';
 import { CourseScheduleManagement } from './components/schedule/CourseScheduleManagement';
 import { EnhancedJitsiClassroom } from './components/classroom/EnhancedJitsiClassroom';
+import { VirtualClassroomHub } from './components/classroom/VirtualClassroomHub';
 import { VirtualLearningHub } from './components/classroom/VirtualLearningHub';
 import { InteractiveLearningSession } from './components/classroom/InteractiveLearningSession';
 import { VirtualLabEnvironment } from './components/classroom/VirtualLabEnvironment';
@@ -78,6 +79,8 @@ const AppContent: React.FC = () => {
       case 'schedule':
         return <EnhancedSchedule />;
       case 'virtual-classroom':
+        return <VirtualClassroomHub />;
+      case 'jitsi-classroom':
         return <EnhancedJitsiClassroom />;
       case 'virtual-learning-hub':
         return <VirtualLearningHub />;

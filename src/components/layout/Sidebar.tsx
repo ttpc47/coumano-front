@@ -41,6 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       { id: 'course-schedules', label: 'Course Schedules', icon: Calendar },
       { id: 'schedule', label: 'Schedule', icon: Calendar },
       { id: 'virtual-classroom', label: 'Virtual Classroom', icon: Video },
+      { id: 'jitsi-classroom', label: 'Jitsi Classroom', icon: Monitor },
       { id: 'virtual-learning-hub', label: 'Learning Hub', icon: BookOpen },
       { id: 'interactive-session', label: 'Interactive Sessions', icon: Users },
       { id: 'virtual-lab', label: 'Virtual Lab', icon: Settings },

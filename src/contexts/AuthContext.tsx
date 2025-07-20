@@ -27,9 +27,12 @@ const mockUsers: User[] = [
     firstName: 'Marie',
     lastName: 'Ngozi',
     email: 'admin@university.cm',
+    phone: '+237 6XX XXX XXX',
+    isActive: true,
     role: 'admin',
     isFirstLogin: false,
     createdAt: '2024-01-15T00:00:00Z',
+    name: 'Marie Ngozi'
   },
   {
     id: '2',
@@ -37,10 +40,13 @@ const mockUsers: User[] = [
     firstName: 'Dr. Paul',
     lastName: 'Mbarga',
     email: 'p.mbarga@university.cm',
+    phone: '+237 6XX XXX XXX',
+    isActive: true,
     role: 'lecturer',
     department: 'Computer Science',
     isFirstLogin: false,
     createdAt: '2024-02-01T00:00:00Z',
+    name: 'Dr. Paul Mbarga'
   },
   {
     id: '3',
@@ -48,11 +54,15 @@ const mockUsers: User[] = [
     firstName: 'Aminata',
     lastName: 'Fouda',
     email: 'a.fouda@student.university.cm',
+    phone: '+237 6XX XXX XXX',
+    isActive: true,
     role: 'student',
     department: 'Computer Science',
     specialty: 'Software Engineering',
+    level: 3,
     isFirstLogin: true,
     createdAt: '2024-03-01T00:00:00Z',
+    name: 'Aminata Fouda'
   },
 ];
 

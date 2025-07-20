@@ -6,12 +6,14 @@ import { recordingService } from '../../services/recordingService';
 import { attendanceService } from '../../services/attendanceService';
 import { notificationService } from '../../services/notificationService';
 import { transcriptionService, RealTimeTranscription } from '../../services/transcriptionService';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface ClassroomSession {
   id: string;
   title: string;
   course: string;
   instructor: string;
+  instructorId: string;
   startTime: string;
   endTime?: string;
   participants: number;
@@ -24,9 +26,13 @@ interface ClassroomSession {
   notificationsEnabled: boolean;
   transcriptionEnabled: boolean;
   subtitlesEnabled: boolean;
+  targetSpecialties: string[];
+  targetLevel?: number;
+  createdBy: string;
 }
 
 export const EnhancedJitsiClassroom: React.FC = () => {
+  const { user } = useAuth();
   const [activeSession, setActiveSession] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(true);
@@ -48,6 +54,7 @@ export const EnhancedJitsiClassroom: React.FC = () => {
       title: 'Advanced Algorithms - Lecture 5',
       course: 'CS301',
       instructor: 'Dr. Paul Mbarga',
+      instructorId: 'LEC001',
       startTime: '2024-03-15T08:00:00',
       participants: 34,
       maxParticipants: 80,
@@ -58,13 +65,17 @@ export const EnhancedJitsiClassroom: React.FC = () => {
       autoAttendanceEnabled: true,
       notificationsEnabled: true,
       transcriptionEnabled: true,
-      subtitlesEnabled: true
+      subtitlesEnabled: true,
+      targetSpecialties: ['Software Engineering', 'Data Science'],
+      targetLevel: 3,
+      createdBy: 'ADM001'
     },
     {
       id: '2',
       title: 'Database Systems - Practical Session',
       course: 'CS205',
       instructor: 'Prof. Marie Nkomo',
+      instructorId: 'LEC002',
       startTime: '2024-03-15T14:00:00',
       participants: 0,
       maxParticipants: 50,
@@ -74,9 +85,36 @@ export const EnhancedJitsiClassroom: React.FC = () => {
       autoAttendanceEnabled: true,
       notificationsEnabled: true,
       transcriptionEnabled: true,
-      subtitlesEnabled: false
+      subtitlesEnabled: false,
+      targetSpecialties: ['Software Engineering'],
+      targetLevel: 2,
+      createdBy: 'ADM001'
     }
   ];
+
+  // Filter sessions based on user role and permissions
+  const getVisibleSessions = () => {
+    return mockSessions.filter(session => {
+      if (user?.role === 'admin') {
+        return true; // Admins see all sessions
+      }
+      
+      if (user?.role === 'lecturer') {
+        return true; // Lecturers see all sessions
+      }
+      
+      if (user?.role === 'student') {
+        // Students only see sessions for their specialty and level
+        const matchesSpecialty = user.specialty && session.targetSpecialties.includes(user.specialty);
+        const matchesLevel = !session.targetLevel || session.targetLevel === (user.level || 3);
+        return matchesSpecialty && matchesLevel;
+      }
+      
+      return false;
+    });
+  };
+
+  const canCreateSession = user?.role === 'admin';
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -106,7 +144,8 @@ export const EnhancedJitsiClassroom: React.FC = () => {
   const initializeJitsiMeet = () => {
     if (!jitsiContainerRef.current) return;
 
-    const session = mockSessions.find(s => s.id === activeSession);
+    const visibleSessions = getVisibleSessions();
+    const session = visibleSessions.find(s => s.id === activeSession);
     if (!session) return;
 
     // Clear container
@@ -189,6 +228,15 @@ export const EnhancedJitsiClassroom: React.FC = () => {
   };
 
   const handleStartRecording = async (sessionId: string) => {
+    const session = getVisibleSessions().find(s => s.id === sessionId);
+    if (!session) return;
+    
+    // Only admins and the session instructor can start recording
+    if (user?.role !== 'admin' && session.instructorId !== user?.matricule) {
+      alert('You do not have permission to start recording.');
+      return;
+    }
+    
     try {
       await recordingService.startRecording(sessionId, {
         quality: 'HD',
@@ -203,6 +251,15 @@ export const EnhancedJitsiClassroom: React.FC = () => {
   };
 
   const handleStopRecording = async (sessionId: string) => {
+    const session = getVisibleSessions().find(s => s.id === sessionId);
+    if (!session) return;
+    
+    // Only admins and the session instructor can stop recording
+    if (user?.role !== 'admin' && session.instructorId !== user?.matricule) {
+      alert('You do not have permission to stop recording.');
+      return;
+    }
+    
     try {
       await recordingService.stopRecording(sessionId);
       setIsRecording(false);
@@ -290,7 +347,7 @@ export const EnhancedJitsiClassroom: React.FC = () => {
   };
 
   if (activeSession) {
-    const session = mockSessions.find(s => s.id === activeSession);
+    const session = getVisibleSessions().find(s => s.id === activeSession);
     
     return (
       <div className="h-screen bg-gray-900 flex">
@@ -368,23 +425,27 @@ export const EnhancedJitsiClassroom: React.FC = () => {
                 {isAudioOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
               </button>
               
-              {/* Recording Controls */}
-              {!isRecording ? (
-                <button
-                  onClick={() => handleStartRecording(activeSession)}
-                  className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-                  title="Start Recording"
-                >
-                  <Record className="w-5 h-5" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleStopRecording(activeSession)}
-                  className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-                  title="Stop Recording"
-                >
-                  <Square className="w-5 h-5" />
-                </button>
+              {/* Recording Controls - Only for admins and instructors */}
+              {(user?.role === 'admin' || session?.instructorId === user?.matricule) && (
+                <>
+                  {!isRecording ? (
+                    <button
+                      onClick={() => handleStartRecording(activeSession)}
+                      className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                      title="Start Recording"
+                    >
+                      <Record className="w-5 h-5" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleStopRecording(activeSession)}
+                      className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                      title="Stop Recording"
+                    >
+                      <Square className="w-5 h-5" />
+                    </button>
+                  )}
+                </>
               )}
 
               {/* Transcription Controls */}
@@ -459,6 +520,12 @@ export const EnhancedJitsiClassroom: React.FC = () => {
                   <span>{transcriptionLanguage.toUpperCase()}</span>
                 </div>
               )}
+              {session?.targetSpecialties && (
+                <div className="text-xs text-gray-300 mt-2">
+                  Target: {session.targetSpecialties.join(', ')}
+                  {session.targetLevel && ` (Level ${session.targetLevel})`}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -477,20 +544,29 @@ export const EnhancedJitsiClassroom: React.FC = () => {
     );
   }
 
+  const visibleSessions = getVisibleSessions();
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Enhanced Virtual Classroom</h1>
           <p className="text-gray-600 mt-1">Advanced video conferencing with real-time transcription and subtitles</p>
+          {user?.role === 'student' && (
+            <p className="text-sm text-blue-600 mt-1">
+              Showing sessions for {user.specialty} - Level {user.level || 3}
+            </p>
+          )}
         </div>
-        <button 
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Schedule Session</span>
-        </button>
+        {canCreateSession && (
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Schedule Session</span>
+          </button>
+        )}
       </div>
 
       {/* Enhanced Features Overview */}
@@ -501,8 +577,8 @@ export const EnhancedJitsiClassroom: React.FC = () => {
               <Record className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Auto Recording</p>
-              <p className="text-lg font-bold text-gray-900">HD Quality</p>
+              <p className="text-sm font-medium text-gray-600">HD Recording</p>
+              <p className="text-lg font-bold text-gray-900">Enabled</p>
             </div>
           </div>
         </div>
@@ -548,7 +624,7 @@ export const EnhancedJitsiClassroom: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Current Sessions</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {mockSessions.filter(s => s.status === 'live').map((session) => (
+          {visibleSessions.filter(s => s.status === 'live').map((session) => (
             <div key={session.id} className="border border-red-200 bg-red-50 rounded-xl p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
@@ -560,6 +636,22 @@ export const EnhancedJitsiClassroom: React.FC = () => {
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(session.status)}`}>
                     LIVE
                   </span>
+                </div>
+              </div>
+
+              {/* Target Audience */}
+              <div className="mb-4">
+                <div className="flex flex-wrap gap-1">
+                  {session.targetSpecialties.map((specialty, index) => (
+                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                      {specialty}
+                    </span>
+                  ))}
+                  {session.targetLevel && (
+                    <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+                      Level {session.targetLevel}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -633,7 +725,7 @@ export const EnhancedJitsiClassroom: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Scheduled Sessions</h2>
         <div className="space-y-4">
-          {mockSessions.filter(s => s.status === 'scheduled').map((session) => (
+          {visibleSessions.filter(s => s.status === 'scheduled').map((session) => (
             <div key={session.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -649,6 +741,18 @@ export const EnhancedJitsiClassroom: React.FC = () => {
                       {session.transcriptionEnabled && <span>Transcription enabled</span>}
                       {session.subtitlesEnabled && <span>Subtitles enabled</span>}
                       {session.autoAttendanceEnabled && <span>Auto-tracking enabled</span>}
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {session.targetSpecialties.map((specialty, index) => (
+                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                          {specialty}
+                        </span>
+                      ))}
+                      {session.targetLevel && (
+                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                          Level {session.targetLevel}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -669,7 +773,7 @@ export const EnhancedJitsiClassroom: React.FC = () => {
         </div>
       </div>
 
-      {/* Enhanced Features Info */}
+      {/* Quick Features */}
       <div className="bg-gradient-to-br from-primary-50 to-secondary-50 rounded-xl p-6">
         <div className="text-center">
           <Monitor className="w-12 h-12 text-primary-600 mx-auto mb-4" />
@@ -677,6 +781,21 @@ export const EnhancedJitsiClassroom: React.FC = () => {
           <p className="text-gray-600 mb-4">
             Every session features automatic recording, real-time transcription, live subtitles, and intelligent attendance tracking
           </p>
+          {user?.role === 'student' && (
+            <p className="text-sm text-blue-600 mb-4">
+              You can view and join sessions scheduled for your specialty and level.
+            </p>
+          )}
+          {user?.role === 'lecturer' && (
+            <p className="text-sm text-green-600 mb-4">
+              You can view all sessions and manage sessions you're assigned to teach.
+            </p>
+          )}
+          {user?.role === 'admin' && (
+            <p className="text-sm text-purple-600 mb-4">
+              You have full access to create, edit, and manage all virtual classroom sessions.
+            </p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
             <div className="bg-white rounded-lg p-4">
               <Record className="w-8 h-8 text-red-600 mx-auto mb-2" />

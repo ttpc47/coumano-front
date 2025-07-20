@@ -15,7 +15,8 @@ import {
   Bell,
   BarChart3,
   Upload,
-  Cog
+  Cog,
+  Monitor
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 

@@ -15,6 +15,11 @@ import { SystemSettings } from './components/admin/SystemSettings';
 import { CourseManagement } from './components/courses/CourseManagement';
 import { CourseScheduleManagement } from './components/schedule/CourseScheduleManagement';
 import { EnhancedJitsiClassroom } from './components/classroom/EnhancedJitsiClassroom';
+import { VirtualLearningHub } from './components/classroom/VirtualLearningHub';
+import { InteractiveLearningSession } from './components/classroom/InteractiveLearningSession';
+import { VirtualLabEnvironment } from './components/classroom/VirtualLabEnvironment';
+import { AdaptiveLearningEngine } from './components/classroom/AdaptiveLearningEngine';
+import { AILearningAssistant } from './components/classroom/AILearningAssistant';
 import { EnhancedSchedule } from './components/schedule/EnhancedSchedule';
 import { Materials } from './components/materials/Materials';
 import { Messages } from './components/messages/Messages';
@@ -74,6 +79,14 @@ const AppContent: React.FC = () => {
         return <EnhancedSchedule />;
       case 'virtual-classroom':
         return <EnhancedJitsiClassroom />;
+      case 'virtual-learning-hub':
+        return <VirtualLearningHub />;
+      case 'interactive-session':
+        return <InteractiveLearningSession />;
+      case 'virtual-lab':
+        return <VirtualLabEnvironment />;
+      case 'adaptive-learning':
+        return <AdaptiveLearningEngine />;
       case 'materials':
         return <Materials />;
       case 'recordings':
@@ -113,6 +126,7 @@ const AppContent: React.FC = () => {
           <div className="animate-fade-in">
             {renderContent()}
           </div>
+          <AILearningAssistant />
         </main>
       </div>
     </div>

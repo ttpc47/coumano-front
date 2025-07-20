@@ -22,15 +22,18 @@ import {
   MicOff,
   Monitor,
   FileText,
-  BarChart3
+  BarChart3,
+  User
 } from 'lucide-react';
 import { JitsiVirtualClassroom } from './JitsiVirtualClassroom';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface ClassroomSession {
   id: string;
   title: string;
   course: string;
   instructor: string;
+  instructorId: string;
   startTime: string;
   endTime?: string;
   participants: number;
@@ -48,9 +51,15 @@ interface ClassroomSession {
   transcriptionUrl?: string;
   duration?: number;
   attendanceRate?: number;
+  targetSpecialties: string[];
+  targetLevel?: number;
+  createdBy: string;
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
 export const VirtualClassroomHub: React.FC = () => {
+  const { user } = useAuth();
   const [activeSession, setActiveSession] = useState<string | null>(null);
   const [sessions, setSessions] = useState<ClassroomSession[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -65,6 +74,7 @@ export const VirtualClassroomHub: React.FC = () => {
       title: 'Advanced Algorithms - Dynamic Programming',
       course: 'CS301',
       instructor: 'Dr. Paul Mbarga',
+      instructorId: 'LEC001',
       startTime: '2024-03-15T08:00:00',
       participants: 34,
       maxParticipants: 80,
@@ -77,13 +87,17 @@ export const VirtualClassroomHub: React.FC = () => {
       transcriptionEnabled: true,
       subtitlesEnabled: true,
       description: 'Deep dive into dynamic programming algorithms with practical examples',
-      attendanceRate: 85
+      attendanceRate: 85,
+      targetSpecialties: ['Software Engineering', 'Data Science'],
+      targetLevel: 3,
+      createdBy: 'ADM001'
     },
     {
       id: '2',
       title: 'Database Systems - Query Optimization',
       course: 'CS205',
       instructor: 'Prof. Marie Nkomo',
+      instructorId: 'LEC002',
       startTime: '2024-03-15T14:00:00',
       participants: 0,
       maxParticipants: 50,
@@ -94,13 +108,17 @@ export const VirtualClassroomHub: React.FC = () => {
       notificationsEnabled: true,
       transcriptionEnabled: true,
       subtitlesEnabled: false,
-      description: 'Advanced techniques for optimizing database queries and performance tuning'
+      description: 'Advanced techniques for optimizing database queries and performance tuning',
+      targetSpecialties: ['Software Engineering'],
+      targetLevel: 2,
+      createdBy: 'ADM001'
     },
     {
       id: '3',
       title: 'Linear Algebra - Matrix Operations',
       course: 'MATH201',
       instructor: 'Dr. Jean Fotso',
+      instructorId: 'LEC003',
       startTime: '2024-03-14T10:00:00',
       endTime: '2024-03-14T12:00:00',
       participants: 67,
@@ -117,21 +135,71 @@ export const VirtualClassroomHub: React.FC = () => {
       recordingUrl: '/recordings/math201-matrices-20240314.mp4',
       transcriptionUrl: '/transcriptions/math201-matrices-20240314.vtt',
       duration: 118,
-      attendanceRate: 92
+      attendanceRate: 92,
+      targetSpecialties: ['Applied Mathematics', 'Data Science', 'Physics'],
+      targetLevel: 2,
+      createdBy: 'ADM001'
     }
   ];
 
   useEffect(() => {
-    setSessions(mockSessions);
+    // Apply role-based filtering and permissions
+    const processedSessions = mockSessions.map(session => {
+      let canEdit = false;
+      let canDelete = false;
+
+      if (user?.role === 'admin') {
+        canEdit = true;
+        canDelete = true;
+      } else if (user?.role === 'lecturer' && session.instructorId === user.matricule) {
+        canEdit = true;
+        canDelete = false; // Lecturers can only cancel/update, not delete
+      }
+
+      return {
+        ...session,
+        canEdit,
+        canDelete
+      };
+    });
+
+    // Filter sessions based on user role and permissions
+    const filteredSessions = processedSessions.filter(session => {
+      if (user?.role === 'admin') {
+        return true; // Admins see all sessions
+      }
+      
+      if (user?.role === 'lecturer') {
+        return true; // Lecturers see all sessions but with limited permissions
+      }
+      
+      if (user?.role === 'student') {
+        // Students only see sessions for their specialty and level
+        const matchesSpecialty = user.specialty && session.targetSpecialties.includes(user.specialty);
+        const matchesLevel = !session.targetLevel || session.targetLevel === (user.level || 3);
+        return matchesSpecialty && matchesLevel;
+      }
+      
+      return false;
+    });
+
+    setSessions(filteredSessions);
   }, []);
 
-  const filteredSessions = sessions.filter(session => {
+  const displayedSessions = sessions.filter(session => {
     const matchesSearch = session.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          session.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          session.instructor.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || session.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const canCreateSession = user?.role === 'admin';
+  const canEditSession = (session: ClassroomSession) => session.canEdit || false;
+  const canDeleteSession = (session: ClassroomSession) => session.canDelete || false;
+  const canCancelSession = (session: ClassroomSession) => {
+    return user?.role === 'admin' || (user?.role === 'lecturer' && session.instructorId === user.matricule);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -181,10 +249,18 @@ export const VirtualClassroomHub: React.FC = () => {
   };
 
   const handleCreateSession = () => {
+    if (!canCreateSession) {
+      alert('Only administrators can create new sessions.');
+      return;
+    }
     setShowCreateModal(true);
   };
 
   const handleDuplicateSession = (session: ClassroomSession) => {
+    if (!canCreateSession) {
+      alert('Only administrators can create new sessions.');
+      return;
+    }
     const newSession: ClassroomSession = {
       ...session,
       id: Date.now().toString(),
@@ -192,15 +268,45 @@ export const VirtualClassroomHub: React.FC = () => {
       roomId: `${session.roomId}-copy-${Date.now()}`,
       status: 'scheduled',
       participants: 0,
-      isRecording: false
+      isRecording: false,
+      createdBy: user?.matricule || 'unknown'
     };
     setSessions(prev => [...prev, newSession]);
   };
 
   const handleDeleteSession = (sessionId: string) => {
-    if (window.confirm('Are you sure you want to delete this session?')) {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session || !canDeleteSession(session)) {
+      alert('You do not have permission to delete this session.');
+      return;
+    }
+    
+    if (window.confirm('Are you sure you want to delete this session? This action cannot be undone.')) {
       setSessions(prev => prev.filter(s => s.id !== sessionId));
     }
+  };
+
+  const handleCancelSession = (sessionId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session || !canCancelSession(session)) {
+      alert('You do not have permission to cancel this session.');
+      return;
+    }
+    
+    if (window.confirm('Are you sure you want to cancel this session? Participants will be notified.')) {
+      setSessions(prev => prev.map(s => 
+        s.id === sessionId ? { ...s, status: 'ended' as const } : s
+      ));
+    }
+  };
+
+  const handleEditSession = (session: ClassroomSession) => {
+    if (!canEditSession(session)) {
+      alert('You do not have permission to edit this session.');
+      return;
+    }
+    // Open edit modal (implementation would go here)
+    console.log('Edit session:', session.id);
   };
 
   // If in active session, show the classroom
@@ -224,6 +330,11 @@ export const VirtualClassroomHub: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Virtual Classroom Hub</h1>
           <p className="text-gray-600 mt-1">Manage and join virtual learning sessions with advanced features</p>
+          {user?.role === 'student' && (
+            <p className="text-sm text-blue-600 mt-1">
+              Showing sessions for {user.specialty} - Level {user.level || 3}
+            </p>
+          )}
         </div>
         <div className="flex items-center space-x-3">
           <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
@@ -234,13 +345,15 @@ export const VirtualClassroomHub: React.FC = () => {
             <Settings className="w-4 h-4" />
             <span>Settings</span>
           </button>
-          <button 
-            onClick={handleCreateSession}
-            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Session</span>
-          </button>
+          {canCreateSession && (
+            <button 
+              onClick={handleCreateSession}
+              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Session</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -330,14 +443,14 @@ export const VirtualClassroomHub: React.FC = () => {
           </button>
 
           <div className="text-sm text-gray-600 flex items-center">
-            Showing {filteredSessions.length} of {sessions.length} sessions
+            Showing {displayedSessions.length} of {sessions.length} sessions
           </div>
         </div>
       </div>
 
       {/* Sessions List */}
       <div className="space-y-4">
-        {filteredSessions.map((session) => (
+        {displayedSessions.map((session) => (
           <div key={session.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -374,6 +487,22 @@ export const VirtualClassroomHub: React.FC = () => {
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <User className="w-4 h-4" />
                     <span>{session.instructor}</span>
+                  </div>
+                </div>
+
+                {/* Target Audience Info */}
+                <div className="mb-4">
+                  <div className="flex flex-wrap gap-2">
+                    {session.targetSpecialties.map((specialty, index) => (
+                      <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                        {specialty}
+                      </span>
+                    ))}
+                    {session.targetLevel && (
+                      <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+                        Level {session.targetLevel}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -436,62 +565,89 @@ export const VirtualClassroomHub: React.FC = () => {
                 )}
 
                 {/* Action Menu */}
-                <div className="relative group">
-                  <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Settings className="w-4 h-4" />
-                  </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      <Eye className="w-4 h-4" />
-                      <span>View Details</span>
+                {(canEditSession(session) || canDeleteSession(session) || canCancelSession(session)) && (
+                  <div className="relative group">
+                    <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                      <Settings className="w-4 h-4" />
                     </button>
-                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      <Edit className="w-4 h-4" />
-                      <span>Edit Session</span>
-                    </button>
-                    <button
-                      onClick={() => handleDuplicateSession(session)}
-                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      <Copy className="w-4 h-4" />
-                      <span>Duplicate</span>
-                    </button>
-                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      <Share2 className="w-4 h-4" />
-                      <span>Share Link</span>
-                    </button>
-                    {session.transcriptionUrl && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                       <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <Download className="w-4 h-4" />
-                        <span>Download Transcript</span>
+                        <Eye className="w-4 h-4" />
+                        <span>View Details</span>
                       </button>
-                    )}
-                    <button
-                      onClick={() => handleDeleteSession(session.id)}
-                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      <span>Delete Session</span>
-                    </button>
+                      {canEditSession(session) && (
+                        <button
+                          onClick={() => handleEditSession(session)}
+                          className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          <Edit className="w-4 h-4" />
+                          <span>Edit Session</span>
+                        </button>
+                      )}
+                      {canCreateSession && (
+                        <button
+                          onClick={() => handleDuplicateSession(session)}
+                          className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          <Copy className="w-4 h-4" />
+                          <span>Duplicate</span>
+                        </button>
+                      )}
+                      <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <Share2 className="w-4 h-4" />
+                        <span>Share Link</span>
+                      </button>
+                      {session.transcriptionUrl && (
+                        <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                          <Download className="w-4 h-4" />
+                          <span>Download Transcript</span>
+                        </button>
+                      )}
+                      {canCancelSession(session) && session.status === 'scheduled' && (
+                        <button
+                          onClick={() => handleCancelSession(session.id)}
+                          className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50"
+                        >
+                          <Bell className="w-4 h-4" />
+                          <span>Cancel Session</span>
+                        </button>
+                      )}
+                      {canDeleteSession(session) && (
+                        <button
+                          onClick={() => handleDeleteSession(session.id)}
+                          className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>Delete Session</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {filteredSessions.length === 0 && (
+      {displayedSessions.length === 0 && (
         <div className="text-center py-12">
           <Video className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No sessions found</h3>
-          <p className="text-gray-600 mb-4">No virtual classroom sessions match your search criteria.</p>
-          <button 
-            onClick={handleCreateSession}
-            className="px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
-          >
-            Create First Session
-          </button>
+          <p className="text-gray-600 mb-4">
+            {user?.role === 'student' 
+              ? 'No sessions available for your specialty and level.'
+              : 'No virtual classroom sessions match your search criteria.'
+            }
+          </p>
+          {canCreateSession && (
+            <button 
+              onClick={handleCreateSession}
+              className="px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:from-primary-700 hover:to-secondary-700 transition-all duration-200"
+            >
+              Create First Session
+            </button>
+          )}
         </div>
       )}
     </div>

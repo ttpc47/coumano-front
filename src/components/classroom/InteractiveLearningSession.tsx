@@ -1,26 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Brain, 
-  Users, 
-  MessageCircle, 
-  Poll, 
-  Target, 
-  Award,
-  Clock,
-  CheckCircle,
-  XCircle,
-  BarChart3,
-  Lightbulb,
-  Zap,
-  Heart,
-  ThumbsUp,
-  Share2,
-  Download,
-  Settings,
-  Maximize,
-  Volume2,
-  VolumeX
-} from 'lucide-react';
+import { Brain, Users, MessageCircle, Scroll as Poll, Target, Award, Clock, CheckCircle, XCircle, BarChart3, Lightbulb, Zap, Heart, ThumbsUp, Share2, Download, Settings, Maximize, Volume2, VolumeX } from 'lucide-react';
 
 interface QuizQuestion {
   id: string;

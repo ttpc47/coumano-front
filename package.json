@@ -2,6 +2,7 @@
   "name": "coumano-university-system",
   "private": true,
   "version": "1.0.0",
+  "description": "Cameroon-Oriented University Management System - Frontend",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "homepage": "https://github.com/your-org/coumano",
+  "repository": "https://github.com/your-org/coumano.git",
   "dependencies": {
     "date-fns": "^2.30.0",
     "lucide-react": "^0.344.0",

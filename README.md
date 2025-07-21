@@ -1,4 +1,4 @@
-# 🎓 COUMANO - Cameroon-Oriented University Management System
+# 🎓 COUMANO - Cameroon-Oriented University Management System (Full-Stack)
 
 A comprehensive, web-based academic management and e-learning platform designed specifically for Cameroonian universities. COUMANO provides a complete digital ecosystem for managing departments, specialties, courses, virtual learning, and administrative workflows.
 
@@ -52,12 +52,16 @@ A comprehensive, web-based academic management and e-learning platform designed 
 | **HTTP Client** | Fetch API |
 | **Video Conferencing** | Jitsi Meet API |
 | **Build Tool** | Vite |
+| **Backend** | FastAPI + Python |
+| **Database** | Supabase (PostgreSQL) |
 
 ## 📋 Prerequisites
 
 - Node.js 18+ and npm
 - Modern web browser with WebRTC support
 - Backend API server (Django recommended)
+- Python 3.9+ (for backend)
+- Supabase account (for database)
 
 ## 🛠️ Installation & Setup
 
@@ -68,16 +72,28 @@ cd coumano-frontend
 ```
 
 ### 2. Install Dependencies
+
+#### Frontend Setup
 ```bash
 npm install
 ```
 
+#### Backend Setup
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
 ### 3. Environment Configuration
+
+#### Frontend Environment
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` file with your configuration:
+Edit frontend `.env` file:
 ```env
 VITE_API_BASE_URL=http://localhost:8000/api
 VITE_JITSI_DOMAIN=meet.jit.si
@@ -85,19 +101,56 @@ VITE_JITSI_APP_ID=coumano-university
 # ... other configurations
 ```
 
-### 4. Start Development Server
+#### Backend Environment
 ```bash
-npm run dev
+cd backend
+cp .env.example .env
 ```
 
-The application will be available at `http://localhost:5173`
+Edit backend `.env` file:
+```env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_KEY=your_supabase_service_role_key
+SECRET_KEY=your_super_secret_jwt_key_here
+# ... other configurations
+```
+
+### 4. Database Setup
+
+1. Create a Supabase project at [supabase.com](https://supabase.com)
+2. Go to SQL Editor in your Supabase dashboard
+3. Copy and run the migration from `backend/supabase/migrations/001_initial_schema.sql`
+4. Update your `.env` files with Supabase credentials
+
+### 4. Start Development Server
+
+#### Start Backend Server
+```bash
+cd backend
+python run.py
+# Backend will run on http://localhost:8000
+```
+
+#### Start Frontend Server
+```bash
+npm run dev
+# Frontend will run on http://localhost:5173
+```
+
+The complete application will be available at:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
 
 ## 🔧 Configuration
+
+### Frontend Configuration
 
 ### API Integration
 Configure your backend API endpoints in the environment file:
 ```env
-VITE_API_BASE_URL=https://your-api-domain.com/api
+VITE_API_BASE_URL=http://localhost:8000/api
 ```
 
 ### Jitsi Meet Setup
@@ -115,6 +168,25 @@ VITE_ENABLE_TRANSCRIPTION=true
 VITE_ENABLE_AUTO_ATTENDANCE=true
 VITE_ENABLE_BULK_IMPORT=true
 ```
+
+### Backend Configuration
+
+#### Database Configuration
+```env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_KEY=your_supabase_service_role_key
+```
+
+#### Authentication Configuration
+```env
+SECRET_KEY=your_super_secret_jwt_key_here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=480
+```
+
+#### Email Configuration (Optional)
+Configure SMTP settings for email notifications and password resets.
 
 ## 👤 User Roles & Permissions
 
@@ -144,6 +216,7 @@ VITE_ENABLE_BULK_IMPORT=true
 ### Dashboard
 - Role-specific overview and quick actions
 - Recent activity and upcoming events
+- Real-time analytics and system metrics
 - Performance metrics and notifications
 
 ### Virtual Classroom
@@ -151,6 +224,7 @@ VITE_ENABLE_BULK_IMPORT=true
 - Automatic recording and transcription
 - Real-time attendance tracking
 - Session management and controls
+- Live subtitles and multi-language support
 
 ### User Management
 - Comprehensive user CRUD operations
@@ -162,6 +236,11 @@ VITE_ENABLE_BULK_IMPORT=true
 - System performance monitoring
 - Usage statistics and trends
 - Attendance analytics
+- Real-time system health monitoring
+
+### Course Scheduling
+- Advanced scheduling with conflict detection
+- Room availability management
 - Export capabilities for reports
 
 ## 🔌 API Integration
@@ -169,6 +248,8 @@ VITE_ENABLE_BULK_IMPORT=true
 The frontend expects a REST API with the following endpoints:
 
 ### Authentication
+
+#### Frontend Expected Endpoints
 ```
 POST /auth/login/
 POST /auth/logout/
@@ -176,6 +257,15 @@ POST /auth/change-password/
 ```
 
 ### User Management
+
+#### Backend Provided Endpoints
+```
+POST /api/auth/login
+POST /api/auth/logout
+POST /api/auth/change-password
+GET  /api/auth/me
+```
+
 ```
 GET /users/
 POST /users/
@@ -185,6 +275,7 @@ POST /users/bulk-import/
 ```
 
 ### Academic Structure
+#### Course Management
 ```
 GET /departments/
 POST /departments/
@@ -194,8 +285,17 @@ GET /courses/
 POST /courses/
 ```
 
+#### Virtual Classroom
+```
+GET    /api/virtual-classroom/sessions
+POST   /api/virtual-classroom/sessions
+POST   /api/virtual-classroom/sessions/{id}/join
+POST   /api/virtual-classroom/sessions/{id}/recording/start
+```
+
 ### Sessions & Recordings
 ```
+GET /sessions/
 GET /sessions/
 POST /sessions/
 GET /recordings/
@@ -209,11 +309,33 @@ GET /settings/
 PATCH /settings/
 ```
 
+## 🏗️ Architecture Overview
+
+### Frontend Architecture
+- **React 18** with TypeScript for type safety
+- **Tailwind CSS** for responsive design
+- **React Router** for client-side routing
+- **Context API** for state management
+- **Jitsi Meet External API** for video conferencing
+
+### Backend Architecture
+- **FastAPI** for high-performance API
+- **Supabase** for database and real-time features
+- **JWT Authentication** with role-based access control
+- **Pydantic** for data validation
+- **Row Level Security** for data protection
+
 ## 🚀 Deployment
 
 ### Build for Production
 ```bash
 npm run build
+```
+
+### Build Backend
+```bash
+cd backend
+pip install gunicorn
 ```
 
 ### Deploy to Static Hosting
@@ -224,6 +346,13 @@ The `dist` folder can be deployed to any static hosting service:
 - GitHub Pages
 
 ### Docker Deployment
+
+#### Frontend Dockerfile
+```dockerfile
+FROM node:18-alpine as build
+# ... build steps
+```
+
 ```dockerfile
 FROM node:18-alpine as build
 WORKDIR /app
@@ -239,11 +368,27 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
+#### Backend Dockerfile
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["gunicorn", "app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker"]
+```
+
 ## 🧪 Testing
 
 ### Run Tests
 ```bash
 npm run test
+```
+
+### Backend Tests
+```bash
+cd backend
+pytest
 ```
 
 ### Linting
@@ -256,12 +401,20 @@ npm run lint
 npm run type-check
 ```
 
+### API Testing
+```bash
+# Test API endpoints
+curl http://localhost:8000/health
+```
+
 ## 📊 Performance Optimization
 
 - **Code Splitting**: Automatic route-based code splitting
 - **Lazy Loading**: Components loaded on demand
 - **Image Optimization**: Responsive images with proper formats
 - **Bundle Analysis**: Use `npm run build -- --analyze` to analyze bundle size
+- **Database Optimization**: Indexed queries and efficient data fetching
+- **Caching**: Redis caching for frequently accessed data
 
 ## 🔒 Security Features
 
@@ -269,6 +422,9 @@ npm run type-check
 - **Role-Based Access Control**: Component-level permission checking
 - **Input Validation**: Client-side validation with server-side verification
 - **Secure File Upload**: File type and size validation
+- **Row Level Security**: Database-level access control
+- **Password Hashing**: Secure bcrypt password storage
+- **CORS Protection**: Configurable cross-origin resource sharing
 
 ## 🌍 Internationalization
 
@@ -279,6 +435,15 @@ The system supports multiple languages:
 
 ## 📞 Support & Documentation
 
+### Project Structure
+```
+coumano/
+├── frontend/          # React frontend application
+├── backend/           # FastAPI backend application
+├── docs/             # Additional documentation
+└── README.md         # This file
+```
+
 ### Getting Help
 - Check the [Issues](https://github.com/your-org/coumano-frontend/issues) page
 - Review the [API Documentation](https://api-docs.your-domain.com)
@@ -286,10 +451,20 @@ The system supports multiple languages:
 
 ### Contributing
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes (frontend and/or backend)
+4. Add tests for new functionality
+5. Run tests: `npm test` (frontend) and `pytest` (backend)
+6. Commit changes: `git commit -m 'Add amazing feature'`
+7. Push to branch: `git push origin feature/amazing-feature`
+8. Submit a pull request
+
+### Development Guidelines
+- **Frontend**: Follow React best practices and TypeScript conventions
+- **Backend**: Follow FastAPI patterns and Python PEP 8
+- **Database**: Use migrations for schema changes
+- **Testing**: Write tests for both frontend and backend
+- **Documentation**: Update README and API docs for changes
 
 ## 📄 License
 
@@ -297,6 +472,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
+- Built for Cameroonian universities with love ❤️
+- **FastAPI**: For the excellent Python web framework
 - Built for Cameroonian universities with love ❤️
 - Powered by modern web technologies
 - Designed for African educational excellence

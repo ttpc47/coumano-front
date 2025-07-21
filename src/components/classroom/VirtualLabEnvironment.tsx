@@ -186,13 +186,13 @@ export const VirtualLabEnvironment: React.FC = () => {
   };
 
   return (
-    <div className="h-screen bg-gray-100 flex flex-col">
+    <div className="h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-neutral-200 px-6 py-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-semibold text-gray-900">Virtual Programming Lab</h1>
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+            <h1 className="text-xl font-semibold text-neutral-800">Virtual Programming Lab</h1>
+            <span className="px-3 py-1 bg-primary-100 text-primary-800 text-sm font-medium rounded-full">
               {mockExercise.title}
             </span>
             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -205,15 +205,15 @@ export const VirtualLabEnvironment: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <div className="flex items-center space-x-2 text-sm text-neutral-600">
               <Users className="w-4 h-4" />
               <span>{collaborators} collaborators</span>
             </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <div className="flex items-center space-x-2 text-sm text-neutral-600">
               <Clock className="w-4 h-4" />
               <span>{mockExercise.estimatedTime}m estimated</span>
             </div>
-            <button className="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            <button className="btn-primary">
               <CheckCircle className="w-4 h-4" />
               <span>Submit</span>
             </button>

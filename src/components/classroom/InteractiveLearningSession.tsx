@@ -179,41 +179,41 @@ export const InteractiveLearningSession: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-neutral-50 to-secondary-50">
       {/* Session Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-neutral-200 px-6 py-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-semibold text-gray-900">Interactive Algorithm Design Session</h1>
-            <span className="px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full flex items-center space-x-1">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <h1 className="text-xl font-semibold text-neutral-800">Interactive Algorithm Design Session</h1>
+            <span className="px-3 py-1 bg-accent-100 text-accent-800 text-sm font-medium rounded-full flex items-center space-x-1">
+              <div className="w-2 h-2 bg-accent-500 rounded-full animate-pulse"></div>
               <span>LIVE</span>
             </span>
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <div className="flex items-center space-x-2 text-sm text-neutral-600">
               <Clock className="w-4 h-4" />
               <span>{formatTime(sessionTime)}</span>
             </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <div className="flex items-center space-x-2 text-sm text-neutral-600">
               <Users className="w-4 h-4" />
               <span>67 participants</span>
             </div>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setIsMuted(!isMuted)}
-                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors"
               >
                 {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
               </button>
               <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
-                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors"
               >
                 <Maximize className="w-4 h-4" />
               </button>
-              <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+              <button className="p-2 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors">
                 <Settings className="w-4 h-4" />
               </button>
             </div>

@@ -290,14 +290,14 @@ export const AdaptiveLearningEngine: React.FC = () => {
 
       {/* Learning Profile Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl p-6 shadow-lg">
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-lg">{learningProfile.currentLevel}</span>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Level {learningProfile.currentLevel}</h3>
-              <p className="text-sm text-gray-600">{getXPToNextLevel()} XP to next level</p>
+              <h3 className="font-semibold text-neutral-800">Level {learningProfile.currentLevel}</h3>
+              <p className="text-sm text-neutral-600">{getXPToNextLevel()} XP to next level</p>
             </div>
           </div>
           <div className="w-full bg-primary-200 rounded-full h-2">
@@ -308,41 +308,41 @@ export const AdaptiveLearningEngine: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-secondary-100 to-secondary-200 rounded-xl p-6 shadow-lg">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-green-600 rounded-xl">
+            <div className="p-3 bg-secondary-600 rounded-xl">
               <Zap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Learning Streak</p>
-              <p className="text-2xl font-bold text-gray-900">{learningProfile.streak}</p>
-              <p className="text-sm text-green-600">days in a row</p>
+              <p className="text-sm font-medium text-neutral-600">Learning Streak</p>
+              <p className="text-2xl font-bold text-neutral-800">{learningProfile.streak}</p>
+              <p className="text-sm text-secondary-600">days in a row</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-warning-100 to-warning-200 rounded-xl p-6 shadow-lg">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-yellow-600 rounded-xl">
+            <div className="p-3 bg-warning-600 rounded-xl">
               <Award className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Achievements</p>
-              <p className="text-2xl font-bold text-gray-900">{learningProfile.achievements.length}</p>
-              <p className="text-sm text-yellow-600">badges earned</p>
+              <p className="text-sm font-medium text-neutral-600">Achievements</p>
+              <p className="text-2xl font-bold text-neutral-800">{learningProfile.achievements.length}</p>
+              <p className="text-sm text-warning-600">badges earned</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-accent-100 to-accent-200 rounded-xl p-6 shadow-lg">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-purple-600 rounded-xl">
+            <div className="p-3 bg-accent-600 rounded-xl">
               <Brain className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Total XP</p>
-              <p className="text-2xl font-bold text-gray-900">{learningProfile.totalXP}</p>
-              <p className="text-sm text-purple-600">experience points</p>
+              <p className="text-sm font-medium text-neutral-600">Total XP</p>
+              <p className="text-2xl font-bold text-neutral-800">{learningProfile.totalXP}</p>
+              <p className="text-sm text-accent-600">experience points</p>
             </div>
           </div>
         </div>

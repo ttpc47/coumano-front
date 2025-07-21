@@ -95,13 +95,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       />
       <aside
         className={`
-          bg-blue-700 border-r-2 border-blue-400 w-64 h-screen sticky top-20 left-0 z-50
+          bg-gradient-to-b from-primary-800 to-primary-900 border-r border-primary-600 w-64 h-screen sticky top-20 left-0 z-50 shadow-xl
           transition-transform duration-300
           ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:block
         `}
       >
-        <nav className="p-4 space-y-1 overflow-y-auto">
+        <nav className="p-4 space-y-1 overflow-y-auto h-full">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeItem === item.id;
@@ -115,12 +115,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className={`
                   w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200
                   ${isActive 
-                    ? 'bg-gradient-to-l from-primary-100 to-secondary-400 text-gray-900 shadow-lg scale-105' 
-                    : 'text-white hover:bg-gray-100 hover:text-primary-600'
+                    ? 'bg-gradient-to-r from-accent-500 to-secondary-500 text-white shadow-lg transform scale-105' 
+                    : 'text-primary-100 hover:bg-primary-700 hover:text-white'
                   }
                 `}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} />
+                <Icon className="w-5 h-5" />
                 <span className="font-medium">{item.label}</span>
               </button>
             );

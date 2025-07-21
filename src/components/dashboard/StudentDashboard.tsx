@@ -18,15 +18,15 @@ const StatCard: React.FC<{
   color: string;
   subtitle?: string;
 }> = ({ title, value, icon, color, subtitle }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow flex items-center justify-between">
+  <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105 flex items-center justify-between">
     <div>
-      <p className="text-sm font-medium text-gray-900">{title}</p>
-      <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+      <p className="text-sm font-medium text-neutral-700">{title}</p>
+      <p className="text-3xl font-bold text-neutral-800 mt-2">{value}</p>
       {subtitle && (
-        <p className="text-sm text-gray-700 mt-1">{subtitle}</p>
+        <p className="text-sm text-neutral-600 mt-1">{subtitle}</p>
       )}
     </div>
-    <div className={`p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700`}>
+    <div className="p-3 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg">
       {icon}
     </div>
   </div>

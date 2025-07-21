@@ -37,12 +37,12 @@ const AppContent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-neutral-50 to-secondary-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-18 h-20 bg-gradient-to-br from-red-600 to-secondary-100 rounded-xl flex items-center justify-center mx-auto mb-4 animate-bounce-subtle">
-                <span className="text-blue-600 font-extrabold text-lg">CM</span>
+          <div className="w-18 h-20 bg-gradient-to-br from-accent-500 to-secondary-500 rounded-xl flex items-center justify-center mx-auto mb-4 animate-bounce-subtle shadow-lg">
+                <span className="text-white font-extrabold text-lg">CM</span>
            </div>
-          <p className="text-gray-600 font-medium">Loading COUMANO...</p>
+          <p className="text-neutral-600 font-medium">Loading COUMANO...</p>
         </div>
       </div>
     );

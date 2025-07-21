@@ -225,54 +225,54 @@ export const VirtualLearningHub: React.FC = () => {
 
       {/* Learning Analytics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="card p-6">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-blue-100 rounded-xl">
-              <Video className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-primary-100 rounded-xl">
+              <Video className="w-6 h-6 text-primary-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Sessions Attended</p>
-              <p className="text-2xl font-bold text-gray-900">47</p>
-              <p className="text-sm text-green-600">+12 this week</p>
+              <p className="text-sm font-medium text-neutral-600">Sessions Attended</p>
+              <p className="text-2xl font-bold text-neutral-800">47</p>
+              <p className="text-sm text-success-600">+12 this week</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="card p-6">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-green-100 rounded-xl">
-              <Clock className="w-6 h-6 text-green-600" />
+            <div className="p-3 bg-secondary-100 rounded-xl">
+              <Clock className="w-6 h-6 text-secondary-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Learning Hours</p>
-              <p className="text-2xl font-bold text-gray-900">156</p>
-              <p className="text-sm text-blue-600">This semester</p>
+              <p className="text-sm font-medium text-neutral-600">Learning Hours</p>
+              <p className="text-2xl font-bold text-neutral-800">156</p>
+              <p className="text-sm text-primary-600">This semester</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="card p-6">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-purple-100 rounded-xl">
-              <Brain className="w-6 h-6 text-purple-600" />
+            <div className="p-3 bg-accent-100 rounded-xl">
+              <Brain className="w-6 h-6 text-accent-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Skill Level</p>
-              <p className="text-2xl font-bold text-gray-900">Advanced</p>
-              <p className="text-sm text-purple-600">Top 15%</p>
+              <p className="text-sm font-medium text-neutral-600">Skill Level</p>
+              <p className="text-2xl font-bold text-neutral-800">Advanced</p>
+              <p className="text-sm text-accent-600">Top 15%</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="card p-6">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-yellow-100 rounded-xl">
-              <Award className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 bg-warning-100 rounded-xl">
+              <Award className="w-6 h-6 text-warning-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Achievements</p>
-              <p className="text-2xl font-bold text-gray-900">23</p>
-              <p className="text-sm text-yellow-600">Badges earned</p>
+              <p className="text-sm font-medium text-neutral-600">Achievements</p>
+              <p className="text-2xl font-bold text-neutral-800">23</p>
+              <p className="text-sm text-warning-600">Badges earned</p>
             </div>
           </div>
         </div>

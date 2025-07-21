@@ -18,13 +18,13 @@ const StatCard: React.FC<{
   trendUp?: boolean;
   color: string;
 }> = ({ title, value, icon, trend, trendUp, color }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+  <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105">
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-sm font-medium text-gray-600">{title}</p>
-        <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+        <p className="text-sm font-medium text-neutral-600">{title}</p>
+        <p className="text-3xl font-bold text-neutral-800 mt-2">{value}</p>
         {trend && (
-          <div className={`flex items-center mt-2 ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
+          <div className={`flex items-center mt-2 ${trendUp ? 'text-success-600' : 'text-error-600'}`}>
             <TrendingUp className={`w-4 h-4 mr-1 ${!trendUp && 'rotate-180'}`} />
             <span className="text-sm font-medium">{trend}</span>
           </div>
@@ -45,7 +45,7 @@ export const AdminDashboard: React.FC = () => {
       icon: <Users className="w-6 h-6 text-white" />,
       trend: '+12% from last month',
       trendUp: true,
-      color: 'bg-gradient-to-br from-primary-500 to-primary-600'
+      color: 'bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg'
     },
     {
       title: 'Active Lecturers',
@@ -53,13 +53,13 @@ export const AdminDashboard: React.FC = () => {
       icon: <UserCheck className="w-6 h-6 text-white" />,
       trend: '+3 new this month',
       trendUp: true,
-      color: 'bg-gradient-to-br from-secondary-500 to-secondary-600'
+      color: 'bg-gradient-to-br from-secondary-500 to-secondary-600 shadow-lg'
     },
     {
       title: 'Departments',
       value: '12',
       icon: <Building2 className="w-6 h-6 text-white" />,
-      color: 'bg-gradient-to-br from-accent-500 to-accent-600'
+      color: 'bg-gradient-to-br from-accent-500 to-accent-600 shadow-lg'
     },
     {
       title: 'Active Courses',
@@ -67,7 +67,7 @@ export const AdminDashboard: React.FC = () => {
       icon: <BookOpen className="w-6 h-6 text-white" />,
       trend: '+8 this semester',
       trendUp: true,
-      color: 'bg-gradient-to-br from-purple-500 to-purple-600'
+      color: 'bg-gradient-to-br from-primary-400 to-secondary-400 shadow-lg'
     }
   ];
 

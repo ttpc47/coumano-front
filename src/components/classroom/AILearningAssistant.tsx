@@ -204,7 +204,7 @@ export const AILearningAssistant: React.FC = () => {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-50"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-accent-500 to-primary-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-50 hover:scale-110"
       >
         <Brain className="w-6 h-6" />
       </button>
@@ -212,9 +212,9 @@ export const AILearningAssistant: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50">
+    <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-white rounded-xl shadow-2xl border border-neutral-200 flex flex-col z-50">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-t-xl">
+      <div className="p-4 border-b border-neutral-200 bg-gradient-to-r from-accent-500 to-primary-500 text-white rounded-t-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Brain className="w-6 h-6" />
@@ -241,7 +241,7 @@ export const AILearningAssistant: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-neutral-200">
         {[
           { id: 'chat', label: 'Chat', icon: MessageCircle },
           { id: 'insights', label: 'Insights', icon: TrendingUp },
@@ -254,8 +254,8 @@ export const AILearningAssistant: React.FC = () => {
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex-1 flex items-center justify-center space-x-1 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'text-accent-600 border-b-2 border-accent-600'
+                  : 'text-neutral-600 hover:text-neutral-800'
               }`}
             >
               <Icon className="w-4 h-4" />

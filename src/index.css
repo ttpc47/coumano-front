@@ -62,7 +62,7 @@
 
 /* Status indicator styles */
 .status-success {
-  @apply bg-success-100 text-success-700 border border-success-200;
+  @apply bg-success-100 text-success-700 border border-success-100;
 }
 
 .status-warning {

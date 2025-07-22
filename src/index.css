@@ -62,15 +62,15 @@
 
 /* Status indicator styles */
 .status-success {
-  @apply bg-success-100 text-success-800 border border-success-200;
+  @apply bg-success-100 text-success-700 border border-success-200;
 }
 
 .status-warning {
-  @apply bg-warning-100 text-warning-800 border border-warning-200;
+  @apply bg-warning-100 text-warning-700 border border-warning-200;
 }
 
 .status-error {
-  @apply bg-error-100 text-error-800 border border-error-200;
+  @apply bg-error-100 text-error-700 border border-error-200;
 }
 
 /* Enhanced gradient backgrounds */

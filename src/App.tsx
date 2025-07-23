@@ -75,7 +75,7 @@ const AppContent: React.FC = () => {
       case 'courses':
         return <CourseManagement />;
       case 'course-schedules':
-        return <CourseScheduleManagement />;
+        return <EnhancedCourseScheduleManagement />;
       case 'schedule':
         return <EnhancedSchedule />;
       case 'virtual-classroom':

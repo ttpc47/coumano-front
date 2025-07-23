@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 import logging
 from app.config import settings
 from app.database import get_database
-from app.api import auth, virtual_classroom, courses
+from app.api import auth, virtual_classroom, courses, course_schedules
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -40,6 +40,7 @@ if settings.environment == "production":
 app.include_router(auth.router, prefix="/api")
 app.include_router(virtual_classroom.router, prefix="/api")
 app.include_router(courses.router, prefix="/api")
+app.include_router(course_schedules.router, prefix="/api")
 
 @app.get("/")
 async def root():

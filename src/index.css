@@ -66,11 +66,11 @@
 }
 
 .status-warning {
-  @apply bg-warning-100 text-warning-700 border border-warning-200;
+  @apply bg-warning-100 text-warning-700 border border-warning-100;
 }
 
 .status-error {
-  @apply bg-error-100 text-error-700 border border-error-200;
+  @apply bg-error-100 text-error-700 border border-error-100;
 }
 
 /* Enhanced gradient backgrounds */
